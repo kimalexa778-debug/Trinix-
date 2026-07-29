@@ -1,298 +1,517 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
+/* =========================================================
+NUIT MAGIQUE — script.js
+Aucune bibliothèque externe. Vanilla JS uniquement.
+========================================================= */
+
+(() => {
+'use strict';
+
+/* ---------------------------------------------------------
+0. CONFIGURATION
+-> Pour changer le mot de passe, modifie la ligne ci-dessous.
+--------------------------------------------------------- */
+const PASSWORD = 'eclipse';
+
+const LETTER_TEXT =
+`Salut toi... 🌙
+
+Avant de commencer...
+
+🐈 Les chats m'ont demandé de vérifier une dernière chose.
+
+Tu souris ?
+
+Parce que sinon ils refusent que tu continues.
+
+...
+
+Bon.
+
+Ils disent que c'est bon.
+
+Bienvenue dans l'endroit où j'ai caché quelques morceaux de mon cœur.
+
+Tu sais...
+
+Il existe des personnes qui arrivent doucement.
+
+Puis il y a toi.
+
+Tu es arrivé...
+
+Et tu as complètement changé la décoration.
+
+Maintenant il y a des rires partout.
+
+C'est un peu le bazar...
+
+Mais j'aime bien.
+
+Tu as ce talent étrange de rendre mes journées plus légères.
+
+Même quand tu ne fais rien.
+
+C'est presque de la sorcellerie.
+
+Ou alors les chats travaillent secrètement pour toi.
+
+🐈‍⬛
+
+En tout cas...
+
+Merci d'avoir existé dans mon histoire.
+
+Et si un jour tu oublies à quel point tu peux être précieux...
+
+Reviens ici.
+
+Cette lettre te le rappellera.
+
+Maintenant...
+
+Arrête de lire deux secondes.
+
+Respire.
+
+Et souris un peu.
+
+Oui oui...
+
+Je te vois.
+
+🖤
+Mon Éclipse`;
+
+/* ---------------------------------------------------------
+1. CIEL ÉTOILÉ ANIMÉ (canvas)
+--------------------------------------------------------- */
+const canvas = document.getElementById('stars-canvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+let shootingStars = [];
+let width, height;
+
+function resizeCanvas(){
+width = canvas.width = window.innerWidth;
+height = canvas.height = window.innerHeight;
+buildStars();
 }
 
-body{
-font-family:'Poppins',sans-serif;
-height:100vh;
-overflow:hidden;
-background:linear-gradient(180deg,#050510,#11142a,#1f1645);
-display:flex;
-justify-content:center;
-align-items:center;
-color:white;
+function buildStars(){
+const count = Math.min(140, Math.floor((width * height) / 9000));
+stars = Array.from({ length: count }, () => ({
+x: Math.random() * width,
+y: Math.random() * height,
+r: Math.random() * 1.4 + 0.3,
+baseAlpha: Math.random() * 0.6 + 0.3,
+twinkleSpeed: Math.random() * 0.02 + 0.005,
+phase: Math.random() * Math.PI * 2,
+hue: Math.random() > 0.85 ? 270 : 0 // quelques étoiles violettes
+}));
 }
 
-/* النجوم */
-
-.stars{
-position:fixed;
-inset:0;
-background-image:
-radial-gradient(white 1px,transparent 1px),
-radial-gradient(#d7d7ff 1px,transparent 1px),
-radial-gradient(#ffffff 2px,transparent 2px);
-background-size:120px 120px,180px 180px,250px 250px;
-animation:twinkle 6s infinite alternate;
-opacity:.9;
+function spawnShootingStar(){
+shootingStars.push({
+x: Math.random() * width * 0.6 + width * 0.2,
+y: Math.random() * height * 0.25,
+len: Math.random() * 80 + 60,
+speed: Math.random() * 6 + 8,
+angle: Math.PI / 4 + (Math.random() * 0.2 - 0.1),
+life: 1
+});
 }
 
-@keyframes twinkle{
+function drawStars(t){
+ctx.clearRect(0, 0, width, height);
 
-0%{
-opacity:.4;
-transform:scale(1);
-}
+// étoiles fixes scintillantes  
+for (const s of stars){  
+  const alpha = s.baseAlpha + Math.sin(t * s.twinkleSpeed + s.phase) * 0.3;  
+  ctx.beginPath();  
+  ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);  
+  ctx.fillStyle = s.hue  
+    ? `rgba(190,150,255,${Math.max(0, alpha)})`  
+    : `rgba(255,255,255,${Math.max(0, alpha)})`;  
+  ctx.fill();  
+}  
 
-100%{
-opacity:1;
-transform:scale(1.02);
-}
+// étoiles filantes  
+shootingStars = shootingStars.filter(st => st.life > 0);  
+for (const st of shootingStars){  
+  const dx = Math.cos(st.angle) * st.speed;  
+  const dy = Math.sin(st.angle) * st.speed;  
+  st.x += dx;  
+  st.y += dy;  
+  st.life -= 0.02;  
 
-}
+  const grad = ctx.createLinearGradient(  
+    st.x, st.y,  
+    st.x - Math.cos(st.angle) * st.len,  
+    st.y - Math.sin(st.angle) * st.len  
+  );  
+  grad.addColorStop(0, `rgba(255,255,255,${st.life})`);  
+  grad.addColorStop(1, 'rgba(255,255,255,0)');  
 
-/* القمر */
+  ctx.strokeStyle = grad;  
+  ctx.lineWidth = 2;  
+  ctx.beginPath();  
+  ctx.moveTo(st.x, st.y);  
+  ctx.lineTo(st.x - Math.cos(st.angle) * st.len, st.y - Math.sin(st.angle) * st.len);  
+  ctx.stroke();  
+}  
 
-.moon{
-
-position:fixed;
-
-top:60px;
-
-right:60px;
-
-width:120px;
-
-height:120px;
-
-border-radius:50%;
-
-background:#fff8dc;
-
-box-shadow:
-0 0 30px white,
-0 0 80px rgba(255,255,255,.5);
-
-animation:moon 5s ease-in-out infinite;
-
-}
-
-@keyframes moon{
-
-50%{
-transform:translateY(-10px);
-}
-
-}
-
-/* القطة */
-
-.cat{
-
-position:fixed;
-
-bottom:20px;
-
-left:-80px;
-
-font-size:55px;
-
-animation:walk 18s linear infinite;
-
-filter:drop-shadow(0 0 10px white);
-
-}
-
-@keyframes walk{
-
-0%{
-left:-80px;
-}
-
-100%{
-left:110%;
-}
-
-}
-
-/* صندوق الدخول */
-
-.login{
-
-width:360px;
-
-padding:35px;
-
-background:rgba(255,255,255,.08);
-
-backdrop-filter:blur(12px);
-
-border-radius:25px;
-
-border:1px solid rgba(255,255,255,.15);
-
-text-align:center;
-
-box-shadow:0 0 30px rgba(128,90,255,.35);
-
-z-index:5;
-
-}
-
-.login h1{
-
-font-family:'Great Vibes',cursive;
-
-font-size:55px;
-
-margin-bottom:10px;
-
-}
-
-.subtitle{
-
-font-size:14px;
-
-opacity:.8;
-
-margin-bottom:25px;
-
-}
-
-input{
-
-width:100%;
-
-padding:14px;
-
-border:none;
-
-border-radius:12px;
-
-font-size:15px;
-
-margin-bottom:15px;
-
-outline:none;
+requestAnimationFrame(drawStars);
 
 }
 
-button{
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+requestAnimationFrame(drawStars);
 
-width:100%;
+// étoile filante aléatoire de temps en temps
+setInterval(() => {
+if (Math.random() < 0.55) spawnShootingStar();
+}, 3800);
 
-padding:14px;
+/* ---------------------------------------------------------
+2. PARTICULES FLOTTANTES (cœurs / étincelles CSS)
+--------------------------------------------------------- */
+const particlesEl = document.getElementById('particles');
+const PARTICLE_SYMBOLS = ['🖤', '💜', '✨', '⭐', '💫'];
 
-border:none;
+function spawnParticle(){
+const el = document.createElement('span');
+el.className = 'particle';
+el.textContent = PARTICLE_SYMBOLS[Math.floor(Math.random() * PARTICLE_SYMBOLS.length)];
 
-border-radius:12px;
+const size = Math.random() * 14 + 12;  
+const left = Math.random() * 100;  
+const duration = Math.random() * 8 + 9;  
+const drift = (Math.random() * 120 - 60) + 'px';  
 
-background:#8d6bff;
+el.style.left = left + '%';  
+el.style.fontSize = size + 'px';  
+el.style.setProperty('--drift', drift);  
+el.style.animationDuration = duration + 's';  
 
-color:white;
-
-font-size:16px;
-
-cursor:pointer;
-
-transition:.3s;
-
-}
-
-button:hover{
-
-transform:scale(1.04);
-
-background:#a48aff;
-
-}
-
-#error{
-
-margin-top:15px;
-
-color:#ffb8b8;
-
-font-size:14px;
+particlesEl.appendChild(el);  
+setTimeout(() => el.remove(), duration * 1000 + 200);
 
 }
 
-/* الرسالة */
+setInterval(spawnParticle, 900);
+for (let i = 0; i < 6; i++) setTimeout(spawnParticle, i * 300);
 
-.hidden{
+/* ---------------------------------------------------------
+3. MUSIQUE GÉNÉRATIVE (Web Audio API — pas de fichier externe)
+--------------------------------------------------------- */
+const musicBtn = document.getElementById('music-toggle');
+const musicIcon = document.getElementById('music-icon');
+let audioCtx = null;
+let musicPlaying = false;
+let musicTimer = null;
+let masterGain = null;
 
-display:none;
+// Gamme pentatonique mineure douce, ambiance "boîte à musique"
+const SCALE = [261.63, 293.66, 311.13, 392.00, 440.00, 523.25, 587.33];
+
+function ensureAudio(){
+if (!audioCtx){
+audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+masterGain = audioCtx.createGain();
+masterGain.gain.value = 0.0;
+masterGain.connect(audioCtx.destination);
+}
+}
+
+function pluckNote(freq, time, duration = 1.6, volume = 0.14){
+const osc = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc.type = 'sine';
+osc.frequency.value = freq;
+
+gain.gain.setValueAtTime(0, time);  
+gain.gain.linearRampToValueAtTime(volume, time + 0.05);  
+gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);  
+
+osc.connect(gain);  
+gain.connect(masterGain);  
+osc.start(time);  
+osc.stop(time + duration + 0.1);  
+
+// petite harmonique douce pour un son "cristal"  
+const osc2 = audioCtx.createOscillator();  
+const gain2 = audioCtx.createGain();  
+osc2.type = 'sine';  
+osc2.frequency.value = freq * 2;  
+gain2.gain.setValueAtTime(0, time);  
+gain2.gain.linearRampToValueAtTime(volume * 0.25, time + 0.05);  
+gain2.gain.exponentialRampToValueAtTime(0.0001, time + duration * 0.8);  
+osc2.connect(gain2);  
+gain2.connect(masterGain);  
+osc2.start(time);  
+osc2.stop(time + duration);
 
 }
 
-.paper{
+function scheduleLoop(){
+if (!musicPlaying) return;
+const now = audioCtx.currentTime;
+const notesInPhrase = 4;
+for (let i = 0; i < notesInPhrase; i++){
+const freq = SCALE[Math.floor(Math.random() * SCALE.length)];
+pluckNote(freq, now + i * 0.9, 1.8, 0.1);
+}
+musicTimer = setTimeout(scheduleLoop, notesInPhrase * 900);
+}
 
-width:85vw;
+function toggleMusic(){
+ensureAudio();
+if (audioCtx.state === 'suspended') audioCtx.resume();
 
-max-width:700px;
+musicPlaying = !musicPlaying;  
+musicBtn.classList.toggle('playing', musicPlaying);  
+musicIcon.textContent = musicPlaying ? '♫' : '♪';  
 
-max-height:85vh;
-
-overflow:auto;
-
-background:white;
-
-color:#333;
-
-padding:35px;
-
-border-radius:25px;
-
-box-shadow:0 20px 60px rgba(0,0,0,.45);
+if (musicPlaying){  
+  masterGain.gain.cancelScheduledValues(audioCtx.currentTime);  
+  masterGain.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 1);  
+  scheduleLoop();  
+} else {  
+  masterGain.gain.cancelScheduledValues(audioCtx.currentTime);  
+  masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.6);  
+  clearTimeout(musicTimer);  
+}
 
 }
 
-.paper h2{
+musicBtn.addEventListener('click', toggleMusic);
 
-text-align:center;
+/* ---------------------------------------------------------
+4. GESTION DES ÉCRANS
+--------------------------------------------------------- */
+const screens = {
+password: document.getElementById('screen-password'),
+envelope: document.getElementById('screen-envelope'),
+cats:     document.getElementById('screen-cats'),
+letter:   document.getElementById('screen-letter'),
+};
 
-font-family:'Great Vibes',cursive;
+function showScreen(name){
+Object.values(screens).forEach(s => s.classList.remove('is-active'));
+screens[name].classList.add('is-active');
+}
 
-font-size:50px;
+/* ---------------------------------------------------------
+5. ÉCRAN MOT DE PASSE
+--------------------------------------------------------- */
+const passwordInput = document.getElementById('password-input');
+const passwordSubmit = document.getElementById('password-submit');
+const passwordError = document.getElementById('password-error');
 
-color:#7650ff;
+function checkPassword(){
+const value = passwordInput.value.trim().toLowerCase();
+if (value.length === 0) return;
 
-margin-bottom:20px;
+if (value === PASSWORD){  
+  passwordError.classList.remove('show');  
+  showScreen('envelope');  
+} else {  
+  passwordError.textContent = "Ce n'est pas encore le bon mot... réessaie 💭";  
+  passwordError.classList.add('show');  
+  passwordInput.classList.remove('shake');  
+  // force reflow pour rejouer l'animation  
+  void passwordInput.offsetWidth;  
+  passwordInput.classList.add('shake');  
+}
 
 }
 
-#typing{
+passwordSubmit.addEventListener('click', checkPassword);
+passwordInput.addEventListener('keydown', (e) => {
+if (e.key === 'Enter') checkPassword();
+});
 
-line-height:1.9;
+/* ---------------------------------------------------------
+6. ÉCRAN ENVELOPPE
+--------------------------------------------------------- */
+const envelope = document.getElementById('envelope');
+let envelopeOpened = false;
 
-font-size:18px;
+envelope.addEventListener('click', () => {
+if (envelopeOpened) return;
+envelopeOpened = true;
+envelope.classList.add('is-open');
 
-white-space:pre-line;
+setTimeout(() => {  
+  showScreen('cats');  
+  startCatsScene();  
+}, 1300);
 
-margin-bottom:25px;
+});
+
+/* ---------------------------------------------------------
+7. ÉCRAN CHATS
+--------------------------------------------------------- */
+const catBlack = document.getElementById('cat-black');
+const catWhite = document.getElementById('cat-white');
+const hugHearts = document.getElementById('hug-hearts');
+const catsCaption = document.getElementById('cats-caption');
+const catsStage = document.getElementById('cats-stage');
+
+let catsSceneStarted = false;
+let catsSceneFinished = false;
+
+function spawnHugHearts(){
+const symbols = ['💜', '🖤', '💫'];
+for (let i = 0; i < 8; i++){
+setTimeout(() => {
+const h = document.createElement('span');
+h.className = 'burst-heart';
+h.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+const bx = (Math.random() * 140 - 70) + 'px';
+const by = -(Math.random() * 60 + 60) + 'px';
+const br = (Math.random() * 60 - 30) + 'deg';
+h.style.setProperty('--bx', bx);
+h.style.setProperty('--by', by);
+h.style.setProperty('--br', br);
+hugHearts.appendChild(h);
+setTimeout(() => h.remove(), 1500);
+}, i * 120);
+}
+}
+
+function startCatsScene(){
+if (catsSceneStarted) return;
+catsSceneStarted = true;
+
+catsCaption.textContent = 'Deux petites âmes se cherchent...';  
+
+setTimeout(() => {  
+  catBlack.classList.add('run');  
+  catWhite.classList.add('run');  
+}, 400);  
+
+setTimeout(() => {  
+  catBlack.classList.remove('run');  
+  catWhite.classList.remove('run');  
+  catBlack.classList.add('hug');  
+  catWhite.classList.add('hug');  
+  catsCaption.textContent = 'Enfin réunis 🖤';  
+  spawnHugHearts();  
+}, 2100);  
+
+setTimeout(() => {  
+  spawnHugHearts();  
+}, 2900);  
+
+setTimeout(() => {  
+  catsCaption.textContent = 'Touche l\u2019écran pour continuer →';  
+  catsSceneFinished = true;  
+}, 3800);
 
 }
 
-.catBox{
+catsStage.addEventListener('click', () => {
+if (catsSceneFinished){
+showScreen('letter');
+startTypewriter();
+}
+});
 
-background:#f5f2ff;
+/* ---------------------------------------------------------
+8. ÉCRAN LETTRE — effet machine à écrire
+--------------------------------------------------------- */
+const letterTextEl = document.getElementById('letter-text');
+const letterScroll = document.getElementById('letter-scroll');
+const typeCursor = document.getElementById('type-cursor');
+const replayBtn = document.getElementById('replay-btn');
 
-border-left:5px solid #8d6bff;
+let typewriterRunning = false;
 
-padding:15px;
+function startTypewriter(){
+if (typewriterRunning) return;
+typewriterRunning = true;
 
-border-radius:15px;
+letterTextEl.textContent = '';  
+typeCursor.classList.remove('done');  
 
-margin-top:18px;
+let i = 0;  
+const chars = Array.from(LETTER_TEXT);  
+
+function typeNext(){  
+  if (i >= chars.length){  
+    typewriterRunning = false;  
+    typeCursor.classList.add('done');  
+    return;  
+  }  
+
+  const ch = chars[i];  
+  letterTextEl.textContent += ch;  
+  letterScroll.scrollTop = letterScroll.scrollHeight;  
+  i++;  
+
+  let delay = 26;  
+  if (ch === '\n') delay = 220;  
+  else if ('.!?'.includes(ch)) delay = 260;  
+  else if (ch === ',') delay = 130;  
+  else if (ch === '.') delay = 300;  
+
+  setTimeout(typeNext, delay + Math.random() * 18);  
+}  
+
+typeNext();
 
 }
 
-.catBox p{
+replayBtn.addEventListener('click', () => {
+typewriterRunning = false;
+startTypewriter();
+});
 
-margin-top:8px;
+/* ---------------------------------------------------------
+9. EASTER EGGS 🥚
+--------------------------------------------------------- */
+const moonBtn = document.getElementById('moon');
+const eggToast = document.getElementById('egg-toast');
+let toastTimer = null;
 
-line-height:1.7;
+const moonMessages = [
+"La lune te trouve mignon(ne). ✨",
+"Elle veille sur toi cette nuit. 🌙",
+"Un vœu discret vient d'être fait...",
+"La lune cligne de l'œil.",
+];
 
+const catMessages = [
+"Miaou. (ça veut dire je t'aime, probablement)",
+"Le chat approuve.",
+"Ronron activé.",
+"Il/elle réclame des câlins.",
+];
+
+function showToast(message){
+clearTimeout(toastTimer);
+eggToast.textContent = message;
+eggToast.classList.add('show');
+toastTimer = setTimeout(() => eggToast.classList.remove('show'), 2200);
 }
 
-#hearts{
+moonBtn.addEventListener('click', () => {
+moonBtn.classList.remove('egg-shake');
+void moonBtn.offsetWidth;
+moonBtn.classList.add('egg-shake');
+spawnShootingStar();
+showToast(moonMessages[Math.floor(Math.random() * moonMessages.length)]);
+});
 
-position:fixed;
+[catBlack, catWhite].forEach(cat => {
+cat.addEventListener('click', (e) => {
+e.stopPropagation();
+showToast(catMessages[Math.floor(Math.random() * catMessages.length)]);
+cat.style.transform = 'scale(1.25)';
+setTimeout(() => { cat.style.transform = ''; }, 220);
+});
+});
 
-inset:0;
-
-pointer-events:none;
-
-}
+})();
