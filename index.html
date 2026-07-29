@@ -1,225 +1,95 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌑 Mon Éclipse</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="style.css">
-
-</head>
-
-<body>
-
-<div class="stars"></div>
-
-<div class="moon"></div>
-
-<div class="cat">🐈‍⬛</div>
-
-<div class="login">
-
-<h1>🌑 Mon Éclipse</h1>
-
-<p class="subtitle">
-Ce petit monde est réservé à une seule personne...
-</p>
-
-<input
-type="password"
-id="password"
-placeholder="Mot de passe">
-
-<button onclick="checkPassword()">
-❤️ Ouvrir
-</button>
-
-<p id="error"></p>
-
-</div>
-
-<div id="letter" class="hidden">
-
-<div class="paper">
-
-<h2>🐈 Bienvenue</h2>
-
-<div id="typing"></div>
-
-<div class="catBox">
-
-🐈
-
-<p>
-
-Le comité des chats confirme officiellement que tu occupes son cœur sans payer de loyer depuis 10 mois
-
-😾
-
-</p>
-
-</div>
-
-<div class="catBox">
-
-🐈
-
-<p>
-
-Petit contrôle avant de continuer
-
-As-tu mangé aujourd'hui
-
-Si non
-
-Le chat est très déçu
-
-</p>
-
-</div>
-
-<div class="catBox">
-
-🐈
-
-<p>
-
-Tu peux repartir quand tu veux
-
-Mais laisse ton sourire ici
-
-On en prendra soin
-
-🖤
-
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div id="hearts"></div>
-
-<script src="script.js"></script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌑 Mon Éclipse</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="style.css">
-
-</head>
-
-<body>
-
-<div class="stars"></div>
-
-<div class="moon"></div>
-
-<div class="cat">🐈‍⬛</div>
-
-<div class="login">
-
-<h1>🌑 Mon Éclipse</h1>
-
-<p class="subtitle">
-Ce petit monde est réservé à une seule personne...
-</p>
-
-<input
-type="password"
-id="password"
-placeholder="Mot de passe">
-
-<button onclick="checkPassword()">
-❤️ Ouvrir
-</button>
-
-<p id="error"></p>
-
-</div>
-
-<div id="letter" class="hidden">
-
-<div class="paper">
-
-<h2>🐈 Bienvenue</h2>
-
-<div id="typing"></div>
-
-<div class="catBox">
-
-🐈
-
-<p>
-
-Le comité des chats confirme officiellement que tu occupes son cœur sans payer de loyer depuis 10 mois
-
-😾
-
-</p>
-
-</div>
-
-<div class="catBox">
-
-🐈
-
-<p>
-
-Petit contrôle avant de continuer
-
-As-tu mangé aujourd'hui
-
-Si non
-
-Le chat est très déçu
-
-</p>
-
-</div>
-
-<div class="catBox">
-
-🐈
-
-<p>
-
-Tu peux repartir quand tu veux
-
-Mais laisse ton sourire ici
-
-On en prendra soin
-
-🖤
-
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-<div id="hearts"></div>
-
-<script src="script.js"></script>
-
-</body>
-</html>
+<!DOCTYPE html>  <html lang="fr">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">  
+<title>Une nuit magique 🌙</title>  
+<link rel="stylesheet" href="style.css">  
+</head>  
+<body>    <!-- Ciel étoilé animé (canvas) -->  <canvas id="stars-canvas"></canvas>
+
+  <!-- Particules flottantes (cœurs / étoiles) générées en JS -->    <div id="particles" aria-hidden="true"></div>    <!-- Lune cliquable, toujours visible -->    <button id="moon" class="moon" aria-label="La lune">  
+    <span class="moon-glow"></span>  
+    <span class="moon-face">🌙</span>  
+  </button>    <!-- Bouton musique -->    <button id="music-toggle" class="icon-btn" aria-label="Activer la musique">  
+    <span id="music-icon">♪</span>  
+  </button>    <!-- Petit message easter egg flottant -->    <div id="egg-toast" class="egg-toast" aria-live="polite"></div>    <main id="app">  <!-- ÉCRAN 1 : mot de passe -->  
+<section id="screen-password" class="screen is-active">  
+  <div class="card">  
+    <div class="card-emblem">🌙</div>  
+    <h1 class="title">Une nuit magique t'attend</h1>  
+    <p class="subtitle">Chuchote le mot secret pour entrer...</p>  
+
+    <div class="field">  
+      <input  
+        type="text"  
+        id="password-input"  
+        class="input"  
+        placeholder="mot de passe"  
+        autocomplete="off"  
+        autocapitalize="off"  
+        spellcheck="false"  
+      >  
+    </div>  
+
+    <button id="password-submit" class="btn btn-primary">  
+      <span>Ouvrir la nuit</span>  
+    </button>  
+
+    <p id="password-hint" class="hint">Indice : son nom de code pour toi 🖤</p>  
+    <p id="password-error" class="error" role="alert"></p>  
+  </div>  
+</section>  
+
+<!-- ÉCRAN 2 : enveloppe -->  
+<section id="screen-envelope" class="screen">  
+  <div class="envelope-scene">  
+    <p class="scene-title">Quelque chose t'attend...</p>  
+
+    <button id="envelope" class="envelope" aria-label="Ouvrir l'enveloppe">  
+      <div class="envelope-shadow"></div>  
+      <div class="envelope-body">  
+        <div class="envelope-letter-peek"></div>  
+        <div class="envelope-flap"></div>  
+        <div class="envelope-seal">🖤</div>  
+      </div>  
+    </button>  
+
+    <p class="tap-hint">Touche l'enveloppe pour l'ouvrir</p>  
+  </div>  
+</section>  
+
+<!-- ÉCRAN 3 : les deux chats -->  
+<section id="screen-cats" class="screen">  
+  <div class="cats-scene">  
+    <p class="scene-title" id="cats-title">Deux petites âmes se cherchent...</p>  
+
+    <div class="cats-stage" id="cats-stage">  
+      <button id="cat-black" class="cat cat-black" aria-label="Chat noir">🐈‍⬛</button>  
+      <button id="cat-white" class="cat cat-white" aria-label="Chat blanc">🐈</button>  
+      <div id="hug-hearts" class="hug-hearts" aria-hidden="true"></div>  
+    </div>  
+
+    <p class="cats-caption" id="cats-caption">Comme deux cœurs qui se trouvent enfin.</p>  
+  </div>  
+</section>  
+
+<!-- ÉCRAN 4 : la lettre -->  
+<section id="screen-letter" class="screen">  
+  <div class="letter-scene">  
+    <div class="letter-card">  
+      <div class="letter-header">  
+        <span class="letter-emblem">🖤</span>  
+        <span class="letter-emblem-sub">Pour toi</span>  
+      </div>  
+      <div class="letter-scroll" id="letter-scroll">  
+        <p id="letter-text" class="letter-text"></p><span class="type-cursor" id="type-cursor">|</span>  
+      </div>  
+    </div>  
+    <button id="replay-btn" class="btn btn-secondary">  
+      <span>Relire la lettre</span>  
+    </button>  
+  </div>  
+</section>
+
+  </main>  <script src="script.js"></script>  </body>  
+</html>  
